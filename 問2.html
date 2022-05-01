@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        /* 背景設定 */
+        body {
+            margin: 0
+        }
+
+        #main {
+            width: 600px;
+            height: 750px;
+            background: #000;
+            margin: auto;
+            position: relative;
+        }
+
+        #info {
+            position: absolute;
+            /* left: -180px;
+            width: 180px; */
+        }
+
+        #round {
+            height: 60px;
+            font-size: 35px;
+            line-height: 60px;
+            background: #8c8;
+            border: 3px solid rgb(55, 49, 130);
+            font-weight: bold;
+        }
+
+        table {
+            font-size: 30px;
+            line-height: 40px;
+            width: 100%;
+            border-collapse: collapse
+        }
+
+        table td {
+            font-weight: bold;
+            padding: 3px;
+            border: 1px solid black;
+            background: #fcc;
+        }
+
+        table tr:nth-child(even) td {
+            text-align: right;
+            font-weight: normal;
+            background: #FFF;
+        }
+
+        /* 主角造型 */
+        #me {
+            width: 20px;
+            height: 30px;
+            background: white;
+            border: 1px black solid;
+            box-sizing: border-box;
+            position: absolute;
+            /* 拿捏極限尺寸 L:0~600-寬 H:0~750高*/
+            left: 290px;
+            top: 700px;
+        }
+    </style>
+</head>
+
+<body>
+     <div id="info">
+            <div id="round">Round: 1</div>
+            <table id="highest">
+                <tr>
+                    <td>Highest:</td>
+                </tr>
+                <tr>
+                    <td>anan</td>
+                </tr>
+                <tr>
+                    <td> Round:</td>
+                </tr>
+                <tr>
+                    <td>53</td>
+                </tr>
+            </table>
+        </div>
+    <div id="main">
+        <div class="anamy"></div>
+        <div id="me"></div>
+        <div class="mybullet"></div>
+    </div>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js'
+        integrity='sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=='
+        crossorigin='anonymous'></script>
+
+    <script>
+        // const updateMyPlace = (i) => {
+        //     console.log(i)
+        // }
+
+        // const delay = function (a) { setInterval(updateMyPlace, 500, a) }
+
+        // 想要帶進this在setInterval 但目前這樣無法clearInterval
+        // $('#main').mouseenter(
+        //     function (e) {
+        //         // let x = offsetX
+        //         // $('#main')
+        //         console.log(e);
+        //     }
+        // )
+        // $('#main').mouseout(
+        //     function () {
+        //         clearInterval(delay)
+        //     }
+        // )
+// ----------------------------------------------------------
+// 如何不閃(不被子元素檔到 撇除抓出來的方式)
+        $('#main').mousemove(
+           function(e){
+            
+            let x = e.offsetX+'px';
+            let y = e.offsetY+'px';
+            console.log(x+"."+y);
+            $('#me').css({left:x,top:y})
+           }
+        )
+        $('#me').mousemove(
+            function(e){
+                return true
+            }
+        )
+
+        setInterval(function(){
+            let bulletX = $('#me').css('left')
+            let bulletY = $('#me').css('top')
+            console.log(bulletX+"."+bulletY);
+        },1000)
+    </script>
+</body>
+
+</html>
