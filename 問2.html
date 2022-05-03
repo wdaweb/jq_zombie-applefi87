@@ -119,12 +119,10 @@
         // )
 // ----------------------------------------------------------
 // 如何不閃(不被子元素檔到 撇除抓出來的方式)
-        $('#main').mousemove(
+        $('#main').on('mousemove',null,
            function(e){
-            
-            let x = e.offsetX+'px';
-            let y = e.offsetY+'px';
-            console.log(x+"."+y);
+            let x = e.clientX-$('#main').offset().left+'px';
+            let y = e.clientY-$('#main').offset().top+'px';
             $('#me').css({left:x,top:y})
            }
         )
@@ -137,7 +135,7 @@
         setInterval(function(){
             let bulletX = $('#me').css('left')
             let bulletY = $('#me').css('top')
-            console.log(bulletX+"."+bulletY);
+            // console.log(bulletX+"."+bulletY);
         },1000)
     </script>
 </body>

@@ -101,8 +101,9 @@
         const updateMyPlace = (i) => {
             console.log(i)
         }
-
-        const delay = function (a) { setInterval(updateMyPlace, 500, a) }
+        
+        let timer = 0
+        const delay = function (a) { timer = setInterval(updateMyPlace, 500, a) }
 
         // 想要帶進this在setInterval 但目前這樣無法clearInterval
         $('#main').mouseenter(
@@ -110,9 +111,10 @@
                 delay($(this))
             }
         )
+        // -------------------------------------***************
         $('#main').mouseout(
             function () {
-                clearInterval(delay)
+                clearInterval(timer)
             }
         )
 

@@ -198,16 +198,16 @@
         // -----------------------遊戲設定
         // 亂數生成器
         const ran = (i)=>{
-            // Math.ceil(Math.random()*(i+1))
-            Math.random()
+          
+            return   Math.ceil(Math.random()*(i+1))
         }
         // *******************如何宣告又不立刻執行? 甚至帶入變數?
-        let bm = null
+        let bm = 0
         // -------箱子移動
                 
         const startMove =function(){
             bm = setInterval(boxMove,1000)
-            $('#box').css({transition:'3s'})
+            $('#box').css({transition:'1s'})
      
         }
         const boxMove= function(){
