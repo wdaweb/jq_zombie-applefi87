@@ -9,14 +9,17 @@
     <style>
         /* 背景設定 */
         body {
-            margin: 0
+            margin: 0;
+            overflow: hidden;
         }
 
         #main {
             width: 100vw;
             height: 100vh;
             margin: auto;
+
             position: relative;
+            overflow: hidden;
         }
 
         #info {
@@ -98,10 +101,12 @@
         }
 
         #box {
-            width: 20%;
+            width: 30%;
             height: 20%;
             border: 1px black solid;
             position: absolute;
+            left: 40%;
+            top: 10%;
             overflow: hidden;
         }
 
@@ -140,6 +145,8 @@
         .ok {
             opacity: 0;
             transition: opacity 0.5s;
+            pointer-events: none;
+            -webkit-user-drag: none;
         }
     </style>
 </head>
@@ -226,6 +233,21 @@
                             case 2:
                                 round2()
                                 break;
+                            case 3:
+                                round3()
+                                break;
+                            case 4:
+                                round4()
+                                break;
+                            case 5:
+                                round5()
+                                break;
+                            case 6:
+                                round6()
+                                break;
+                            case 7:
+                                round7()
+                                break;
 
                         }
                     }, 1000)
@@ -233,16 +255,17 @@
             })
             // -------第一關箱子移動
             // 初始動畫
-            let setSpeed =function(){
+            let settransition = function () {
                 $('#box').css({ transition: `${speed / 1000}s` })
             }
             // 初始速度
-            let speed = 1000
-
+            let speed = 1500
+            //  箱子移動
             let boxMove = function () {
+                $('#box').css({ left: `calc(${ran(100)}% - 15%)`, top: `calc(${ran(100)}% - 10%)` })
                 playing = setInterval(function () {
-                    setSpeed()
-                    $('#box').css({ left: `calc(${ran(100)}% - 10%)`, top: `calc(${ran(100)}% - 10%)` })
+                    settransition()
+                    $('#box').css({ left: `calc(${ran(100)}% - 15%)`, top: `calc(${ran(100)}% - 10%)` })
                 }, speed)
             }
             const round1 = function () {
@@ -250,9 +273,25 @@
             }
             // -------第二關箱子高速移動
             const round2 = function () {
-                speed=1000
+                speed = 1000
                 boxMove()
             }
+            // 箱子旋轉
+            let degree = 0
+            let boxMoveRotate = function () {
+                $('#box').css({ left: `calc(${ran(100)}% - 15%)`, top: `calc(${ran(100)}% - 10%)`, transform: `rotate(${degree+= 90}deg )` })
+                playing = setInterval(function () {
+                    settransition()
+                    $('#box').css({ left: `calc(${ran(100)}% - 15%)`, top: `calc(${ran(100)}% - 10%)`, transform: `rotate(${degree+= 90}deg)` })
+                    console.log(degree);
+                }, speed)
+            }
+            // -------第三關箱子旋轉
+            const round3 = function () {
+                speed = 1500
+                boxMoveRotate()
+            }
+
         </script>
 </body>
 
