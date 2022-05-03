@@ -17,15 +17,12 @@
             width: 100vw;
             height: 100vh;
             margin: auto;
-
             position: relative;
             overflow: hidden;
         }
 
         #info {
             position: absolute;
-            /* left: -180px;
-            width: 180px; */
         }
 
         #round {
@@ -255,43 +252,71 @@
             })
             // -------第一關箱子移動
             // 初始動畫
-            let settransition = function () {
+            let setTransition = function () {
                 $('#box').css({ transition: `${speed / 1000}s` })
             }
             // 初始速度
             let speed = 1500
-            //  箱子移動
-            let boxMove = function () {
-                $('#box').css({ left: `calc(${ran(100)}% - 15%)`, top: `calc(${ran(100)}% - 10%)` })
-                playing = setInterval(function () {
-                    settransition()
-                    $('#box').css({ left: `calc(${ran(100)}% - 15%)`, top: `calc(${ran(100)}% - 10%)` })
-                }, speed)
+            //  -----箱子移動
+            // 建立一個object去取function(因為不能改function)
+            let css = {
+                action:
+                    function () {
+                        return { left: `calc(${ran(100)}% - 15%)`, top: `calc(${ran(100)}% - 10%)` }
+                    }
             }
-            const round1 = function () {
-                boxMove()
-            }
-            // -------第二關箱子高速移動
-            const round2 = function () {
-                speed = 1000
-                boxMove()
-            }
-            // 箱子旋轉
-            let degree = 0
-            let boxMoveRotate = function () {
-                $('#box').css({ left: `calc(${ran(100)}% - 15%)`, top: `calc(${ran(100)}% - 10%)`, transform: `rotate(${degree+= 90}deg )` })
-                playing = setInterval(function () {
-                    settransition()
-                    $('#box').css({ left: `calc(${ran(100)}% - 15%)`, top: `calc(${ran(100)}% - 10%)`, transform: `rotate(${degree+= 90}deg)` })
-                    console.log(degree);
-                }, speed)
-            }
-            // -------第三關箱子旋轉
-            const round3 = function () {
-                speed = 1500
-                boxMoveRotate()
+            class actionC{
+// ***************************************************
+// 為了可共用move() 
+// 1.把Css { left: `calc(${ran(100)}% - 15%)`, top: `calc(${ran(100)}% - 10%)` } 用變數拆出來誕生上方的 css
+// 2.要變換move() 裡面的function ，只想到用物件來變換(因為let 不能改) 誕生css.action()
+// 3.發現 move()用變數宣告 會無法改值，所以改用object 來重新宣告重讀css.action()
+// 4.但目前playing 似乎就無法被clearInterval...
+// ***************************************************
+                move(){
+                    $('#box').css(css.action())
+                    playing = setInterval(function () {
+                        setTransition()
+                        $('#box').css(css.action())
+                    }, speed)
+                }
             }
 
+            let boxMove = function () {
+                $('#box').css(css.action())
+                playing = setInterval(function () {
+                    setTransition()
+                    $('#box').css(css.action())
+                }, speed)
+            }
+
+            // -------第1關箱子移動
+            const round1 = function () {
+                var d = new actionC();
+                d.move()
+            }
+            // -------第2關箱子高速移動
+            const round2 = function () {
+                speed = 1000
+                var d = new actionC();
+                d.move()
+            }
+
+            // -------第3關箱子旋轉+移動
+            let degree = 0
+            const round3 = function () {
+                css = {
+                    action:
+                        function () {
+                            return { left: `calc(${ran(100)}% - 15%)`, top: `calc(${ran(100)}% - 10%)`, transform: `rotate(${degree += 90}deg)` }
+                        }
+                }
+                speed = 1500
+                var d = new actionC();
+                d.move()
+            }
+            // -------第4關箱子翻轉+移動
+            
         </script>
 </body>
 
