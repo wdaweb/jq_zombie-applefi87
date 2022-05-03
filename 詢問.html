@@ -101,9 +101,10 @@
         const updateMyPlace = (i) => {
             console.log(i)
         }
-        
+        const speed = 500
+        updateMyPlace(speed)
         let timer = 0
-        const delay = function (a) { timer = setInterval(updateMyPlace, 500, a) }
+        const delay = function (a) { timer = setInterval(updateMyPlace, speed, a) }
 
         // 想要帶進this在setInterval 但目前這樣無法clearInterval
         $('#main').mouseenter(

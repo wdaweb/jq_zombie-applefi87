@@ -77,20 +77,21 @@
         }
 
 
-        #timer{
+        #timer {
             width: 20vw;
             height: 15vh;
-            font-size:10vh;
+            font-size: 10vh;
             line-height: 15vh;
             text-align: center;
             position: absolute;
             top: calc(50% - 7.5vh);
             left: calc(50% - 10vw);
             border: rgb(111, 107, 107) 1px solid;
-            color:rgb(204, 204, 204);
-            display:none;
+            color: rgb(204, 204, 204);
+            display: none;
             transition: 3s;
         }
+
         /* 點擊箱設定 */
         :root {
             --size: 60px;
@@ -135,12 +136,17 @@
             left: calc(50% - var(--size)/2);
             top: calc(50% - var(--size)/2);
         }
+
+        .ok {
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
     </style>
 </head>
 
 <body>
     <div id="info">
-        <div id="round">Round: 1</div>
+        <div id="round"></div>
         <table id="highest">
             <tr>
                 <td>Highest:</td>
@@ -172,8 +178,12 @@
             crossorigin='anonymous'></script>
         <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
-            // -----------------基本局數設定
+            // -------------------------------------------------------基本局數設定
             let round = 1
+            const update = function () {
+                $('#round').text(`Round ${round}`)
+            }
+            update()
             let rest = 5
             // 檢查是否下一關(點擊到方塊後執行)
             const check = () => {
@@ -183,42 +193,66 @@
             // 結束後動作
             const end = (s) => {
                 Swal.fire(`你的紀錄是${s}秒`)
-                $('#start').css({display:'block'})
-                $('#timer').css({display:'none'})
-               
+                $('#start').css({ display: 'block' })
+                $('#timer').css({ display: 'none' })
+
             }
+            // 開始後動作
 
-            // 按壓開始後動作
-
-            $('#start').click(function(){
-                $('#start').css({display:'none'})
-                $('#timer').css({display:'block'})
-                startMove()
+            $('#start').click(function () {
+                $('#start').css({ display: 'none' })
+                $('#timer').css({ display: 'block' })
+                round1()
             })
-        // -----------------------遊戲設定
-        // 亂數生成器
-        const ran = (i)=>{
-          
-            return   Math.ceil(Math.random()*(i+1))
-        }
-        // *******************如何宣告又不立刻執行? 甚至帶入變數?
-        let bm = 0
-        // -------箱子移動
-                
-        const startMove =function(){
-            bm = setInterval(boxMove,1000)
-            $('#box').css({transition:'1s'})
-     
-        }
-        const boxMove= function(){
-            $('#box').css({left:`calc(${ran(100)}% - 10%)`,top:`calc(${ran(100)}% - 10%)`})
-            // **********************為何讀不到?
-            console.log(ran());
-            // $('#box').css({left:`calc(50% - 10vw)`,top:`calc(50% - 7.5vh)`})
-        }
-    
-       
-       
+            // ---------------------------------------------------------------遊戲設定
+            // 亂數生成器
+            const ran = function (i) {
+                return Math.ceil(Math.random() * (i + 1))
+            }
+            //宣告又不立刻執行+帶入變數
+            let playing = 0
+            // 按壓後開始
+            $('.b').click(function (e) {
+                // $(this).fadeTo(500,0)
+                $(this).addClass('ok')
+                // 如果都壓完，隔一秒後下一關
+                if ($('.ok').length == 5) {
+                    clearInterval(playing)
+                    setTimeout(() => {
+                        $('.ok').removeClass('ok')
+                        round++
+                        update()
+                        switch (round) {
+                            case 2:
+                                round2()
+                                break;
+
+                        }
+                    }, 1000)
+                }
+            })
+            // -------第一關箱子移動
+            // 初始動畫
+            let setSpeed =function(){
+                $('#box').css({ transition: `${speed / 1000}s` })
+            }
+            // 初始速度
+            let speed = 1000
+
+            let boxMove = function () {
+                playing = setInterval(function () {
+                    setSpeed()
+                    $('#box').css({ left: `calc(${ran(100)}% - 10%)`, top: `calc(${ran(100)}% - 10%)` })
+                }, speed)
+            }
+            const round1 = function () {
+                boxMove()
+            }
+            // -------第二關箱子高速移動
+            const round2 = function () {
+                speed=1000
+                boxMove()
+            }
         </script>
 </body>
 
