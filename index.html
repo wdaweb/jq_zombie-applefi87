@@ -92,7 +92,7 @@
             transition: 3s;
         }
 
-        /* 點擊箱設定 */
+        /* ---------------------------------------點擊箱設定--------------------- */
         :root {
             --size: 60px;
         }
@@ -101,10 +101,17 @@
             width: 30%;
             height: 20%;
             border: 1px black solid;
+            font-size: 40px;
+            text-align: center;
+            user-select: none;
+            -webkit-user-drag: none;
+            transform: rotateY(0deg);
             position: absolute;
             left: 40%;
             top: 10%;
-            overflow: hidden;
+            /* 不可加 否則內部元素不可升高 */
+            /* overflow: hidden; */
+            transform-style: preserve-3d;
         }
 
         .b {
@@ -112,6 +119,17 @@
             height: var(--size);
             background: #000;
             position: absolute;
+            backface-visibility: hidden;
+            transform: translateZ(1px);
+        }
+
+        .back {
+            width: var(--size);
+            height: var(--size);
+            background: #F00;
+            position: absolute;
+            backface-visibility: hidden;
+            transform: translateZ(-1px) rotateX(180deg);
         }
 
         .b1 {
@@ -169,7 +187,7 @@
     <div id="timer">999.15秒</div>
     <div id="start">START</div>
     <div id="main">
-        <div id="box">
+        <div id="box">Click Black
             <div class="b b1"></div>
             <div class="b b2"></div>
             <div class="b b3"></div>
@@ -182,6 +200,7 @@
             crossorigin='anonymous'></script>
         <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
+         
             // -------------------------------------------------------基本局數設定
             let round = 1
             const update = function () {
@@ -202,7 +221,6 @@
 
             }
             // 開始後動作
-
             $('#start').click(function () {
                 $('#start').css({ display: 'none' })
                 $('#timer').css({ display: 'block' })
@@ -228,24 +246,23 @@
                         update()
                         switch (round) {
                             case 2:
-                                round2()
-                                break;
-                            case 3:
-                                round3()
-                                break;
-                            case 4:
-                                round4()
-                                break;
-                            case 5:
                                 round5()
                                 break;
-                            case 6:
-                                round6()
+                            case 3:
+                                round5()
                                 break;
-                            case 7:
-                                round7()
-                                break;
-
+                            // case 4:
+                            //     round4()
+                            //     break;
+                            // case 5:
+                            //     round5()
+                            //     break;
+                            // case 6:
+                            //     round6()
+                            //     break;
+                            // case 7:
+                            //     round7()
+                            //     break;
                         }
                     }, 1000)
                 }
@@ -253,7 +270,7 @@
             // -------第一關箱子移動
             // 初始動畫
             let setTransition = function () {
-                $('#box').css({ transition: `${speed / 1000}s` })
+                $('#box').css({ transition: `all ${speed / 1000}s linear` })
             }
             // 初始速度
             let speed = 1500
@@ -265,15 +282,16 @@
                         return { left: `calc(${ran(100)}% - 15%)`, top: `calc(${ran(100)}% - 10%)` }
                     }
             }
-            class actionC{
-// ***************************************************
-// 為了可共用move() 
-// 1.把Css { left: `calc(${ran(100)}% - 15%)`, top: `calc(${ran(100)}% - 10%)` } 用變數拆出來誕生上方的 css
-// 2.要變換move() 裡面的function ，只想到用物件來變換(因為let 不能改) 誕生css.action()
-// 3.發現 move()用變數宣告 會無法改值，所以改用object 來重新宣告重讀css.action()
-// 4.但目前playing 似乎就無法被clearInterval...
-// ***************************************************
-                move(){
+
+            // ***************************************************
+            // 為了可共用move() 
+            // 1.把Css { left: `calc(${ran(100)}% - 15%)`, top: `calc(${ran(100)}% - 10%)` } 用變數拆出來誕生上方的 css
+            // 2.要變換move() 裡面的function ，只想到用物件來變換(因為let 不能改) 誕生css.action()
+            // 3.發現 move()用變數宣告 會無法改值，所以改用object 來重新宣告重讀css.action()
+            // 4.但目前playing 似乎就無法被clearInterval...
+            // ***************************************************
+            class actionC {
+                move() {
                     $('#box').css(css.action())
                     playing = setInterval(function () {
                         setTransition()
@@ -303,20 +321,53 @@
             }
 
             // -------第3關箱子旋轉+移動
-            let degree = 0
+
             const round3 = function () {
+                let degree = 0
                 css = {
                     action:
                         function () {
                             return { left: `calc(${ran(100)}% - 15%)`, top: `calc(${ran(100)}% - 10%)`, transform: `rotate(${degree += 90}deg)` }
                         }
                 }
-                speed = 1500
                 var d = new actionC();
                 d.move()
             }
             // -------第4關箱子翻轉+移動
-            
+
+            const round4 = function () {
+                degree = 0
+                css = {
+                    action:
+                        function () {
+                            return { left: `calc(${ran(100)}% - 15%)`, top: `calc(${ran(100)}% - 10%)`, transform: `rotateY(${degree += 90}deg)` }
+                        }
+                }
+                var d = new actionC();
+                d.move()
+            }
+            // -------第5關箱子翻轉+移動
+
+            const round5 = function () {
+                degree = 0
+                let boxInB = $('#box').html().match(/<(\s|.)*/)
+                console.log(boxInB);
+            $('#box').html("Only Click Black!"+boxInB)
+                for (let i = 1; i <= 5; i++) {
+                    $('#box').append($(`<div class="back b${i}" data-num="${i}" ></div>`))
+                }
+                $('.back').click(function () {
+                    $('.b').eq($(this).attr('data-num') - 1).removeClass('ok')
+                })
+                css = {
+                    action:
+                        function () {
+                            return { left: `calc(${ran(100)}% - 15%)`, top: `calc(${ran(100)}% - 10%)`, transform: `rotateY(${degree += 90}deg)` }
+                        }
+                }
+                var d = new actionC();
+                d.move()
+            }
         </script>
 </body>
 

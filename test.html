@@ -7,37 +7,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
-        /* 背景設定 */
-        #main {
-            width: 100vw;
-            height: 100vh;
-            position: absolute;
-            /* 會發現main 蓋住#start */
-            background-color: rgba(117, 45, 45, 0.5);
-        }
-
-        /* 按鈕設定 */
-        #start{
-            background-color: #8c8;
-            position:absolute;
-            /* 把這補上去 不被蓋住就正常 */
-            /* z-index: 2; */
-        }
-        #start:hover{
-            background-color: rgb(81, 86, 233);
-        }
 
     </style>
 </head>
 
 <body>
-    <div id="start">START</div>
-    <div id="main">
-    </div>
+   <div id="out">out
+       <div id="in">in</div>
+   </div>
+   <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js' integrity='sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==' crossorigin='anonymous'></script>
+
+    <script>
+    let out = document.getElementById('out')
+    out.textContent='oouutt'
+    </script>
 </body>
-<script>
-    let a = 0
-    console.log(a+=90);
-    console.log(a+=90);
-</script>
+
 </html>

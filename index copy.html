@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        /* 背景設定 */
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+
+     
+       
+        /* ---------------------------------------點擊箱設定--------------------- */
+
+        #box {
+            width: 30%;
+            height: 20%;
+            border: 1px black solid;
+            transform:rotateY(0deg);
+            position: absolute;
+            /* overflow: hidden; */
+            transform-style: preserve-3d;
+            /* perspective: 20px; */
+        }
+
+        .b{
+            width: 60px;
+            height: 60px;
+            background: #000;
+            position: absolute;
+            backface-visibility: hidden;
+            transform: translateZ(1px);
+        }
+
+
+      
+
+     
+    </style>
+</head>
+
+<body>
+    
+
+        <div id="box">Click ----Black
+            <div class="b b1"></div>
+      
+</body>
+
+</html>
