@@ -13,6 +13,10 @@
             overflow: hidden;
         }
 
+        div {
+            user-select: none;
+        }
+
         #main {
             width: 100vw;
             height: 100vh;
@@ -169,9 +173,9 @@
 
         .alert {
             position: absolute;
-            left: 50%;
+            width: 100%;
+            text-align: center;
             top: 50%;
-            transform: translateX(-50%);
             font-size: 50px;
         }
     </style>
@@ -185,7 +189,7 @@
                 <td>Highest:</td>
             </tr>
             <tr>
-                <td id="name">none</td>
+                <td id="name">無人</td>
             </tr>
             <tr>
                 <td>Time:</td>
@@ -210,41 +214,21 @@
     <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js'
         integrity='sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=='
         crossorigin='anonymous'></script>
-    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="http://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        // -------------------------------------------------------基本局數設定
-        let round = 8
-        //***********************************************************************************
-        let start_time = Date.now()
-        const update = function () {
-            $('#round').text(`Round ${round}/5`)
-        }
-        update()
-        // 結束後動作
-        let times = 999;
-        const end = () => {
-            Swal.fire(`你的紀錄是${times}秒`)
-            $('#start').css({ display: 'block' })
-            $('#timer').css({ display: 'none' })
 
-            if (times < highestScore.score) {
-                const input = prompt('新紀錄，請輸入名稱')
-                highestScore.score = times;
-                highestScore.name = input;
-                $('#name').text(input);
-                $('#score').text(times);
-                localStorage.setItem('winner', JSON.stringify(highestScore))
-            }
-            round = 1
-        }
-        // 開始後動作
-        $('#start').click(function () {
-            $('.ok').removeClass('ok')
-            start_time = Date.now()
-            $('#start').css({ display: 'none' })
-            $('#timer').css({ display: 'block' })
-            round2()
-        })
+        // 初始設定
+        let round = 1
+        let updateTime = 0
+        // 耗費時間(初始設999,以免讀取意外)
+        let times = 0;
+        let start_time = 0
+        // 初始速度
+        let speed = 1500
+        // 箱子旋轉變數
+        let degree = 0
+        // 第十關 紀錄錯太多次會有變化(增加字體大小+顏色)
+        let tooManyTimes = -1
         // ---------------------------------------遊戲資料設定
         let highestScore = { name: '', score: 999 }
         let storage = localStorage.getItem('winner')
@@ -255,6 +239,63 @@
             $('#name').text(storage.name);
             $('#score').text(storage.score);
         }
+        // -------------------------------------------------------基本局數設定
+        const update = function () {
+            $('#round').text(`Round ${round}/10`)
+        }
+        update()
+        // 結束後動作
+        const end = () => {
+            clearInterval(updateTime)
+            clearInterval(waitTime)
+            times = (Date.now() - start_time) / 1000
+            $('#start').css({ display: 'block' })
+            $('#timer').css({ display: 'none' })
+            if (times < highestScore.score) {
+               
+                const ending = async function () {
+                    const { value: userName } = await Swal.fire({
+                        title: "停一步海闊天空-恭喜過關",
+                        text: `你的紀錄是${times}秒`,
+                        input: 'text',
+                        showCancelButton: false
+                    });
+                    highestScore.score = times;
+                    highestScore.name = userName;
+                    $('#name').text(userName);
+                    $('#score').text(times);
+                    localStorage.setItem('winner', JSON.stringify(highestScore))
+                }
+                ending()
+            }else{ Swal.fire('停一步海闊天空-恭喜過關')}
+        }
+        // 開始後動作
+        $('#start').click(function () {
+            updateTime = setInterval(function () {
+                times = (Math.floor((Date.now() - start_time) / 100) / 10).toFixed(1)
+                $('#timer').text(times + 's')
+            }, 100)
+            function initial(e) {
+                // 把重完可能漏改的變數再刷一次
+                // round = 1;
+                round = 1;
+                times = 0;
+                playing = 0
+                waitTime = 0
+                clickTimes = -1
+                wait = -1
+                speed = 1500
+                degree = 0
+                tooManyTimes = -1
+            }
+            initial()
+            $('.ok').removeClass('ok')
+            start_time = Date.now()
+            $('#start').css({ display: 'none' })
+            $('#timer').css({ display: 'block' })
+            round1()
+        })
+
         // ---------------------------------------------------------------遊戲設定
         // 亂數生成器
         const ran = function (i) {
@@ -270,70 +311,66 @@
         // 按壓後開始
         $('.b').click(function (e) {
             event.stopPropagation()
-            $(this).addClass('ok')
+            if (clickTimes == -1) {
+                $(this).addClass('ok')
+            }
             // 第九關專用記數
             if (clickTimes > -1) {
                 r9Count()
             }
             // 如果都壓完，隔一秒後下一關
-            if (($('.ok').length == 5 || clickTimes >= 8) && $('#start').css('display') == 'none') {
+            if (($('.ok').length == 5 || clickTimes >= 50) && $('#start').css('display') == 'none') {
                 // **************************************************************************************************
-                console.log("ok");
                 clearInterval(playing)
-                setTimeout(() => {
-                    $('.ok').removeClass('ok')
-                    round++
-                    update()
-                    switch (round) {
-                        case 2:
-                            round2()
-                            break;
-                        case 3:
-                            round3()
-                            break;
-                        case 4:
-                            round4()
-                            break;
-                        case 5:
-                            round5()
-                            break;
-                        case 6:
-                            round6()
-                            break;
-                        case 7:
-                            round7()
-                            break;
-                        case 8:
-                            round8()
-                            break;
-                        case 9:
-                            round9()
-                            break;
-                        case 10:
-                            round10()
-                            break;
-                        // 第10關亂點重回9關
-                        default:
-                            round9()
-                            round = 9
-                    }
-                    //    消除第九關的clickTimes 以免上面自動執行
-                    clickTimes = -1
-                }, 1000)
+                $('.ok').removeClass('ok')
+                round++
+                switch (round) {
+                    case 2:
+                        round2()
+                        break;
+                    case 3:
+                        round3()
+                        break;
+                    case 4:
+                        round4()
+                        break;
+                    case 5:
+                        round5()
+                        break;
+                    case 6:
+                        round6()
+                        break;
+                    case 7:
+                        round7()
+                        break;
+                    case 8:
+                        round8()
+                        break;
+                    case 9:
+                        round9()
+                        break;
+                    case 10:
+                        //    消除第九關的clickTimes 以免上面自動執行
+                        clickTimes = -1
+                        round10()
+                        break;
+                    // 第10關亂點重回9關
+                    default:
+                        round = 9
+                        round9()
+                }
+                update()
             }
         })
         const r9Count = function () {
             clickTimes++
-            console.log(clickTimes);
-            $('.alert').text(`click black ${50 - clickTimes} times`)
+            $('.alert').text(`click only ${50 - clickTimes} times`)
         }
         // -------第一關箱子移動
         // 初始動畫
         let setTransition = function () {
             $('#box').css({ transition: `all ${speed / 1000}s linear` })
         }
-        // 初始速度
-        let speed = 1500
         //  -----箱子移動
         // 建立一個object去取function(因為不能改function)
         let css = {
@@ -344,30 +381,14 @@
         }
 
         // ***************************************************
-        // 為了可共用move() 
-        // 1.把Css { left: `calc(${ran(100)}% - 15%)`, top: `calc(${ran(100)}% - 10%)` } 用變數拆出來誕生上方的 css
-        // 2.要變換move() 裡面的function ，只想到用物件來變換(因為let 不能改) 誕生css.action()
-        // 3.發現 move()用變數宣告 會無法改值，所以改用object 來重新宣告重讀css.action()
-        // 4.但目前playing 似乎就無法被clearInterval...
-        // ***************************************************
         class actionC {
             move() {
                 $('#box').css(css.action())
                 playing = setInterval(function () {
                     setTransition()
-                    times = (Date.now() - start_time) / 1000
-                    $('#timer').text(times)
                     $('#box').css(css.action())
                 }, speed)
             }
-        }
-
-        let boxMove = function () {
-            $('#box').css(css.action())
-            playing = setInterval(function () {
-                setTransition()
-                $('#box').css(css.action())
-            }, speed)
         }
 
         // -------第1關箱子移動
@@ -385,7 +406,7 @@
         // -------第3關箱子旋轉+移動
 
         const round3 = function () {
-            let degree = 0
+
             css = {
                 action:
                     function () {
@@ -430,6 +451,7 @@
         // -------第6關箱子紅色點了要全重點
         const round6 = function () {
             $('.back').remove();
+            $('.back').off();
             $('.alert').text('Never click red')
             $('#box').css({ background: 'red', transform: `rotateY(0deg)` })
             $('#box').click(function () {
@@ -444,12 +466,13 @@
             var d = new actionC();
             d.move()
         }
-        // -------第7關不能碰到箱子
+        // -------第7關不能離開箱子
         const round7 = function () {
             speed = 2000
             $('.alert').text('Never hover Yellow!')
             $('#box').css({ background: 'white' })
-            $('#main').css({ background: 'rgba(0,255,0,0.7)' })
+            $('#main').css({ background: ' yellow' })
+            $('#box').off('click');
             $('#box').mouseover(function () {
                 event.stopPropagation()
             })
@@ -465,22 +488,16 @@
             var d = new actionC();
             d.move()
         }
-        // -------第8關紅色點了要全重點+不能碰到箱子
+        // -------第8關紅色點了要全重點+不能離開箱子
         const round8 = function () {
             speed = 2000
             $('.back').remove();
             $('#box').css({ background: 'red' })
-            $('#main').css({ background: 'rgba(0,255,0,0.7)' })
+            $('#main').css({ background: 'yellow' })
             $('#box').click(function () {
                 $('.b').removeClass('ok')
             })
             $('.alert').text('Never hover Yellow + Never click red!')
-            $('#box').mouseover(function () {
-                event.stopPropagation()
-            })
-            $('#main').mouseover(function () {
-                $('.b').removeClass('ok')
-            })
             css = {
                 action:
                     function () {
@@ -492,52 +509,48 @@
         }
         // -------第9關點50下
         const round9 = function () {
-            speed = 300
-            clickTimes = 0
-            $('#box').css({ background: 'black' })
+            $('#box').off('click');
+            speed = 500
+            $('#box').css({ background: 'white' })
             $('#main').css({ background: 'white' })
-            $('.alert').text('click black 50 times')
-            $('#box').click(function () {
-                $('.b').removeClass('ok')
-                r9Count()
-            })
+            $('.alert').text('click only 50 times')
             css = {
                 action:
                     function () {
-                        return { left: `calc(${ran(100)}% - 15%)`, top: `20%` }
+                        return { left: `20%`, top: `20%` }
+                        // return { left: `calc(${ran(100)}% - 15%)`, top: `20%` }
                     }
             }
             var d = new actionC();
-            d.move()
+            d.move();
             clearInterval(waitTime);
+            clickTimes = 0
         }
         // -------第10關-不要點
-        // 點太多次，增加字體大小+顏色
-        let tooManyTimes = -1
         const round10 = function () {
+            $('.alert').text('Do not click "black"')
             tooManyTimes++
             wait = 0
             waitTime = setInterval(function () {
-                wait += 0.1;
-                (round = 10 && wait >= 15) ? end() : true;
-            }, 100)
+                wait += 1;
+                (round == 10 && wait >= 15) ? end() : true;
+            }, 1000)
             speed = 2000
-            $('#box').css({ background: 'white' })
-            $('.alert').text('Do not click black')
             $('.b').click(function (e) {
                 wait = 0
             })
             switch (tooManyTimes) {
+                case 0:
+                    break;
                 case 1:
                     $('.alert').css({ "font-size": "70px" })
                     break;
                 case 2:
-                    $('.alert').css({ "font-size": "90px", color: 'red' })
-                    $('.alert').text('Do not click "black"!!')
+                    $('.alert').css({ "font-size": "100px", color: 'red' })
                     break;
-                case 3:
+                default:
                     $('.alert').text('Go endless Hell!')
-                    break;
+                    $('.alert').css({ "font-size": "100px" })
             }
         }
     </script>
