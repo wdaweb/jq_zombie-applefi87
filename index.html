@@ -252,7 +252,7 @@
             $('#start').css({ display: 'block' })
             $('#timer').css({ display: 'none' })
             if (times < highestScore.score) {
-               
+
                 const ending = async function () {
                     const { value: userName } = await Swal.fire({
                         title: "停一步海闊天空-恭喜過關",
@@ -267,7 +267,7 @@
                     localStorage.setItem('winner', JSON.stringify(highestScore))
                 }
                 ending()
-            }else{ Swal.fire('停一步海闊天空-恭喜過關')}
+            } else { Swal.fire('停一步海闊天空-恭喜過關') }
         }
         // 開始後動作
         $('#start').click(function () {
@@ -287,6 +287,9 @@
                 speed = 1500
                 degree = 0
                 tooManyTimes = -1
+                // 清除第10關
+                $('.alert').css({ "font-size": "50px", color: 'black' })
+                $('.alert').text('click black box')
             }
             initial()
             $('.ok').removeClass('ok')
@@ -371,63 +374,50 @@
         let setTransition = function () {
             $('#box').css({ transition: `all ${speed / 1000}s linear` })
         }
-        //  -----箱子移動
-        // 建立一個object去取function(因為不能改function)
-        let css = {
-            action:
-                function () {
-                    return { left: `calc(${ran(100)}% - 15%)`, top: `calc(${ran(100)}% - 10%)` }
-                }
-        }
 
         // ***************************************************
-        class actionC {
-            move() {
-                $('#box').css(css.action())
-                playing = setInterval(function () {
-                    setTransition()
-                    $('#box').css(css.action())
-                }, speed)
-            }
+        // 每關固定的變化
+        const move = (act) => {
+            $('#box').css(act())
+            playing = setInterval(function () {
+                setTransition()
+                $('#box').css(act())
+            }, speed)
         }
 
         // -------第1關箱子移動
         const round1 = function () {
-            var d = new actionC();
-            d.move()
+            //  -----箱子移動
+            let css = function () {
+                return { left: `calc(${ran(100)}% - 15%)`, top: `calc(${ran(100)}% - 10%)` }
+            }
+            move(css)
         }
         // -------第2關箱子高速移動
         const round2 = function () {
             speed = 1000
-            var d = new actionC();
-            d.move()
+            let css = function () {
+                return { left: `calc(${ran(100)}% - 15%)`, top: `calc(${ran(100)}% - 10%)` }
+            }
+            move(css)
         }
 
         // -------第3關箱子旋轉+移動
-
+        //  上個是move(cssr1)，我一定要變成是重設個function:cssr2 進去 move()?
         const round3 = function () {
-
-            css = {
-                action:
-                    function () {
-                        return { left: `calc(${ran(100)}% - 15%)`, top: `calc(${ran(100)}% - 10%)`, transform: `rotate(${degree += 90}deg)` }
-                    }
+            let css = function () {
+                return { left: `calc(${ran(100)}% - 15%)`, top: `calc(${ran(100)}% - 10%)`, transform: `rotate(${degree += 90}deg)` }
             }
-            var d = new actionC();
-            d.move()
+            move(css)
         }
         // -------第4關箱子翻轉+移動
 
         const round4 = function () {
             degree = 0
-            css = {
-                action:
-                    function () {
-                        return { left: `calc(${ran(100)}% - 15%)`, top: `calc(${ran(100)}% - 10%)`, transform: `rotateY(${degree += 90}deg)` }
-                    }
+            let css = function () {
+                return { left: `calc(${ran(100)}% - 15%)`, top: `calc(${ran(100)}% - 10%)`, transform: `rotateY(${degree += 90}deg)` }
             }
-            var d = new actionC();
-            d.move()
+            move(css)
         }
         // -------第5關箱子紅色點了要重點黑色
         const round5 = function () {
@@ -439,14 +429,10 @@
             $('.back').click(function () {
                 $('.b').eq($(this).attr('data-num') - 1).removeClass('ok')
             })
-            css = {
-                action:
-                    function () {
-                        return { left: `calc(${ran(100)}% - 15%)`, top: `calc(${ran(100)}% - 10%)`, transform: `rotateY(${degree += 90}deg)` }
-                    }
+            let css = function () {
+                return { left: `calc(${ran(100)}% - 15%)`, top: `calc(${ran(100)}% - 10%)`, transform: `rotateY(${degree += 90}deg)` }
             }
-            var d = new actionC();
-            d.move()
+            move(css)
         }
         // -------第6關箱子紅色點了要全重點
         const round6 = function () {
@@ -457,20 +443,16 @@
             $('#box').click(function () {
                 $('.b').removeClass('ok')
             })
-            css = {
-                action:
-                    function () {
-                        return { left: `calc(${ran(100)}% - 15%)`, top: `calc(${ran(100)}% - 10%)` }
-                    }
+            let css = function () {
+                return { left: `calc(${ran(100)}% - 15%)`, top: `calc(${ran(100)}% - 10%)` }
             }
-            var d = new actionC();
-            d.move()
+            move(css)
         }
         // -------第7關不能離開箱子
         const round7 = function () {
             speed = 2000
             $('.alert').text('Never hover Yellow!')
-            $('#box').css({ background: 'white' })
+            $('#box').css({ background: 'rgba(0,0,0,0)' })
             $('#main').css({ background: ' yellow' })
             $('#box').off('click');
             $('#box').mouseover(function () {
@@ -479,6 +461,10 @@
             $('#main').mouseover(function () {
                 $('.b').removeClass('ok')
             })
+            let css = function () {
+                return { left: `calc(${ran(100)}% - 15%)`, top: `calc(${ran(100)}% - 10%)` }
+            }
+            move(css)
             css = {
                 action:
                     function () {
@@ -498,36 +484,36 @@
                 $('.b').removeClass('ok')
             })
             $('.alert').text('Never hover Yellow + Never click red!')
-            css = {
-                action:
-                    function () {
-                        return { left: `calc(${ran(100)}% - 15%)`, top: `calc(${ran(100)}% - 10%)` }
-                    }
+            let css = function () {
+                return { left: `calc(${ran(100)}% - 15%)`, top: `calc(${ran(100)}% - 10%)` }
             }
-            var d = new actionC();
-            d.move()
+            move(css)
         }
         // -------第9關點50下
         const round9 = function () {
             $('#box').off('click');
             speed = 500
-            $('#box').css({ background: 'white' })
+            $('#box').css({ background: 'rgba(0,0,0,0)' })
+            $('.b').css({ width: '100%', height: '100%' })
             $('#main').css({ background: 'white' })
             $('.alert').text('click only 50 times')
-            css = {
-                action:
-                    function () {
-                        return { left: `20%`, top: `20%` }
-                        // return { left: `calc(${ran(100)}% - 15%)`, top: `20%` }
-                    }
+            $('#main').mouseover(function () {
+                $('.b').removeClass('ok')
+            })
+            let css = function () {
+                return { left: `calc(${ran(100)}% - 15%)`, top: `20%` }
             }
-            var d = new actionC();
-            d.move();
+            move(css)
             clearInterval(waitTime);
             clickTimes = 0
         }
         // -------第10關-不要點
         const round10 = function () {
+            // 清除第8關的
+            $('#main').off('mouseover')
+
+            $('#box').css({ left: `20%`, top: `20%` })
+            $('.b').css({ width: 'var(--size)', height: 'var(--size)' })
             $('.alert').text('Do not click "black"')
             tooManyTimes++
             wait = 0
